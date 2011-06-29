@@ -17,11 +17,15 @@
 (defn to-pos-long [p]
   (long (max 0 (to-long p))))
 
+(defn not-blank? [s]
+  (not (string/blank? s)))
+
 (defn weather-data [source]
   (<- [?station ?date ?valid-precipitation]
     (source ?line)
     (is-data-line? ?line)
     (parse-line ?line :#> 41 {0 ?station 1 ?date 22 ?precipitation})
+    (not-blank? ?precipitation)
     (to-pos-long ?precipitation :> ?valid-precipitation)
     (:distinct false)))
 

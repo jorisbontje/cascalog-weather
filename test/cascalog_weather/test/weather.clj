@@ -23,6 +23,13 @@
     (test?- [["240" "20100101" 0] ["240" "20100102" 7]]
             (weather-data lines))))
 
+(deftest weather-data-should-skip-lines-without-precipitation
+  (with-tmp-sources [lines [["#comment"] [""]
+[" 240,20100103,   28,   42,   46,   80,    3,    0,   21,  130,    4,  -16,  -63,   22,    8,   13,  -86,   24,   50,   64,  343,    0,     ,   -1,    1,10030,10094,   24, 9985,    3,   60,    1,   80,   15,    3,   82,   95,   24,   69,   15,    3"]]]
+    (test?- []
+            (weather-data lines))))
+
+
 (deftest test-average-precipitation-per-month
   (with-tmp-sources [data [["240" "20100101" 0] ["240" "20100102" 7]]]
     (test?- [["240" "201001" "3.50"]]
