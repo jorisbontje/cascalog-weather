@@ -4,25 +4,22 @@
         [cascalog-weather.weather]
         [clojure.test]))
 
+(deftest is-data-line-should-skip-empty-line
+  (is (not (is-data-line? ""))))
+
+(deftest is-data-line-should-skip-comments
+  (is (not (is-data-line? "# This is a line with comments"))))
+
+(deftest is-data-line-should-pass-data
+  (is (is-data-line? "1, 2, 3")))
+
 (deftest parse-line-should-parse-line-with-commas
-  (is (= [:data [1 2 3]] (parse-line "1, 2, 3"))))
+  (is (= [1 2 3] (parse-line "1, 2, 3"))))
 
-(deftest parse-line-should-skip-empty-line
-  (is (= [:empty] (parse-line ""))))
-
-(deftest parse-line-should-skip-comments
-  (is (= [:comment] (parse-line "# This is a line with comments"))))
-
-(deftest test-parse-line-op
-  (with-tmp-sources [lines [["# comment"] [""] ["1, 2, 3"]]]
-    (test?<- [[:comment] [:empty] [:data [1 2 3]]]
-             [?output]
+(deftest test-combined
+  (with-tmp-sources [lines [["#comment"] [""] ["1, 2, 3"]]]
+    (test?<- [[1 2 3]]
+             [?station ?date ?precipitation]
              (lines ?line)
-             (parse-line-op ?line :> ?output))))
-
-(deftest test-parse-line-op
-  (with-tmp-sources [lines [["# comment"] [""] ["1, 2, 3"]]]
-    (test?<- [[:comment] [:empty] [:data [1 2 3]]]
-             [?output]
-             (lines ?line)
-             (parse-line-op ?line :> ?output))))
+             (is-data-line? ?line)
+             (parse-line ?line :> ?station ?date ?precipitation))))

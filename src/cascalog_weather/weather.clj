@@ -6,14 +6,13 @@
 
 (defn to-long [num] (Long/parseLong (string/trim num)))
 
-(defn parse-line [line]
-  (cond
-    (.isEmpty line) [:empty]
-    (.startsWith line "#") [:comment]
-    :else [:data (map to-long (string/split line #","))]))
+(defn is-data-line? [line]
+  (not (or
+    (.isEmpty line)
+    (.startsWith line "#"))))
 
-(defmapop parse-line-op [& line]
-  (parse-line line))
+(defn parse-line [line]
+  (map to-long (string/split line #",")))
 
 (defn -main [weather-dir output-dir]
   (println "Input and output:" weather-dir output-dir))
