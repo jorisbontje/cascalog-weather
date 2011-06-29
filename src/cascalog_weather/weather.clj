@@ -25,17 +25,16 @@
     (to-pos-long ?precipitation :> ?valid-precipitation)
     (:distinct false)))
 
-(defn average-precipitation-per-month [output-tap weather-tap]
-  (let [weather (weather-data weather-tap)]
-    (?<- output-tap
-      [?station ?yearmonth ?rounded-avg-precipitation]
-      (weather ?station ?date ?precipitation)
-      (subs ?date 0 6 :> ?yearmonth)
-      (c/avg ?precipitation :> ?avg-precipitation)
-      (format "%.2f" ?avg-precipitation :> ?rounded-avg-precipitation)
-    )))
+(defn average-precipitation-per-month [weather]
+  (<- [?station ?yearmonth ?rounded-avg-precipitation]
+    (weather ?station ?date ?precipitation)
+    (subs ?date 0 6 :> ?yearmonth)
+    (c/avg ?precipitation :> ?avg-precipitation)
+    (format "%.2f" ?avg-precipitation :> ?rounded-avg-precipitation)
+  ))
 
 (defn -main [weather-dir output-dir]
   (let [weather-tap (hfs-textline weather-dir)
+        weather (weather-data weather-tap)
         output-tap (hfs-textline output-dir)]
-    (average-precipitation-per-month output-tap weather-tap)))
+    (?- output-tap (average-precipitation-per-month weather))))
