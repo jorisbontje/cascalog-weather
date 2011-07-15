@@ -1,0 +1,6 @@
+<configuration>
+  <property>
+    <name>io.serializations</name>
+    <value>cascading.tuple.hadoop.BytesSerialization,cascading.tuple.hadoop.TupleSerialization,org.apache.hadoop.io.serializer.WritableSerialization,org.apache.hadoop.io.serializer.JavaSerialization</value>
+  </property>
+</configuration>

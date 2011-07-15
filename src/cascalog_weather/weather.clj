@@ -21,24 +21,24 @@
   (not (string/blank? s)))
 
 (defn weather-data [source]
-  (<- [?station ?date ?valid-precipitation]
+  (<- [?station ?date ?valid-temperature]
     (source ?line)
     (is-data-line? ?line)
-    (parse-line ?line :#> 41 {0 ?station 1 ?date 22 ?precipitation})
-    (not-blank? ?precipitation)
-    (to-pos-long ?precipitation :> ?valid-precipitation)
+    (parse-line ?line :#> 24 {0 ?station 1 ?date 7 ?temperature})
+    (not-blank? ?temperature)
+    (to-pos-long ?temperature :> ?valid-temperature)
     (:distinct false)))
 
-(defn average-precipitation-per-month [weather]
-  (<- [?station ?yearmonth ?rounded-avg-precipitation]
-    (weather ?station ?date ?precipitation)
+(defn average-temperature-per-month [weather]
+  (<- [?station ?yearmonth ?rounded-avg-temperature]
+    (weather ?station ?date ?temperature)
     (subs ?date 0 6 :> ?yearmonth)
-    (c/avg ?precipitation :> ?avg-precipitation)
-    (format "%.2f" ?avg-precipitation :> ?rounded-avg-precipitation)
+    (c/avg ?temperature :> ?avg-temperature)
+    (format "%.2f" ?avg-temperature :> ?rounded-avg-temperature)
   ))
 
 (defn -main [weather-dir output-dir]
   (let [weather-tap (hfs-textline weather-dir)
         weather (weather-data weather-tap)
         output-tap (hfs-textline output-dir)]
-    (?- output-tap (average-precipitation-per-month weather))))
+    (?- output-tap (average-temperature-per-month weather))))
